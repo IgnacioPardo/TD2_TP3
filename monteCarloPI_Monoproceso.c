@@ -18,10 +18,10 @@ double monteCarloPi(int64_t samples) {
         double x = ((double)rand()/(double)RAND_MAX);
         double y = ((double)rand()/(double)RAND_MAX);
 
-				// Distancia al (0, 0) del punto (x, y)
+		// Distancia al (0, 0) del punto (x, y)
         double d = sqrt(x*x + y*y);
 				
-				// De ser su distancia al (0, 0) <= 1 determinamos el punto (x, y) esta contenido en el circulo
+		// De ser su distancia al (0, 0) <= 1 determinamos el punto (x, y) esta contenido en el circulo
         if (d <= 1)
             circle++;
         else
@@ -33,8 +33,8 @@ double monteCarloPi(int64_t samples) {
     //printf(", T: %"PRId64, samples);
     //printf(", Sum: %"PRId64"\n", circle + square);
     
-		// Dividimos la cantidad de puntos dentro del circulo con N, para hallar una aproximacion de π/4 y la multiplicamos por 4 para obtener la aproximacion de π.
-		double pi = ((double)circle/(double)samples) * 4;// COMPLETAR
+	// Dividimos la cantidad de puntos dentro del circulo con N, para hallar una aproximacion de π/4 y la multiplicamos por 4 para obtener la aproximacion de π.
+	double pi = ((double)circle/(double)samples) * 4;// COMPLETAR
     return pi;
 }
 

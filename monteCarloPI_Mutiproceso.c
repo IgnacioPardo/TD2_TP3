@@ -5,22 +5,36 @@
 #include <sys/wait.h>
 #include <limits.h>
 #include <time.h>
+#include <math.h>
+#include <inttypes.h>
 
 void fileWrite(char* file, int64_t value ) {
     FILE* pfile = fopen(file,"w");
-    fprintf(pfile,"%ld\n",value);
+    fprintf(pfile,"%lld\n",value);
     fclose(pfile);
 }
 
 void fileRead(char* file, int64_t* value ) {
     FILE* pfile = fopen(file,"r");
-    fscanf(pfile, "%ld", value);
+    fscanf(pfile, "%lld", value);
     fclose(pfile);
 }
 
 void monteCarloPi(int semilla, int64_t samples, int64_t* circle, int64_t* square) {
     srand(semilla);
     // COMPLETAR
+
+    for (int64_t i = 0; i < samples; i++) {
+ 
+        double x = ((double)rand()/(double)RAND_MAX);
+        double y = ((double)rand()/(double)RAND_MAX);
+
+        double d = sqrt(x*x + y*y);
+        if (d <= 1)
+            circle++;
+        else
+            square++;
+    }
 }
 
 int main()
@@ -44,7 +58,7 @@ int main()
             nameCircle[1] = nameCircle[1] + i;
             fileWrite(nameCircle, circle);
             fileWrite(nameSquare, square);
-            printf("%i -- Contando %li circle para %li square\n", mypid, circle, square);
+            printf("%i -- Contando %lli circle para %lli square\n", mypid, circle, square);
             exit(0);
         }
     }
