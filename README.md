@@ -8,7 +8,11 @@
 
 ### 🗃 **Estructura del repositorio**:
   
-
+```C
+	monteCarloPI_Monoproceso.c
+	monteCarloPI_Multiproceso.c
+	monteCarloPI_Multiproceso_optativo.c
+```
         
 📅 **Fecha**: Noviembre 2021
 
