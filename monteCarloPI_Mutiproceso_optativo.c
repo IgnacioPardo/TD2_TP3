@@ -19,7 +19,7 @@ void fileRead(char* file, int64_t* value ) {
     fclose(pfile);
 }
 
-void monteCarloPi(int semilla, int64_t samples, int64_t* circle, int64_t* square) {
+void monteCarloPi(int semilla, int64_t samples, int64_t* circle) {
     srand(semilla);
     for (int64_t i = 0; i < samples; i++) {
  
@@ -30,15 +30,23 @@ void monteCarloPi(int semilla, int64_t samples, int64_t* circle, int64_t* square
         double d = sqrt(x*x + y*y);
         // Incrementa circle en 1 si d <= 1
         (*circle) += d <= 1 ? 1 : 0;
-        (*square)++;
     }
+}
+
+int digits(int n){
+    int c = 1;
+    double n_ = (double)n;
+    while (n_ >= 10){
+        n_ = n_/10;
+        c++;
+    }
+    return c;
 }
 
 int main()
 {
-
     int pidRoot = getpid();
-    int processCount =  10;
+    int processCount = 50;
     int64_t n = 100000000;
 
     for (int i = 0; i<processCount; i++) {
@@ -49,16 +57,14 @@ int main()
         if (pid == 0) {
             int mypid = getpid();
             printf("%i -- Procesando...\n", mypid);
-            int64_t square = 0;
             int64_t circle = 0;
-            monteCarloPi(mypid + time(NULL), n, &circle, &square);
-            char nameSquare[3] = {'s','0',0};
-            char nameCircle[3] = {'c','0',0};
-            nameSquare[1] = nameSquare[1] + i;
-            nameCircle[1] = nameCircle[1] + i;
-            fileWrite(nameCircle, circle);
-            fileWrite(nameSquare, square);
-            printf("%i -- Contando %lli circle para %lli square\n", mypid, circle, square);
+            monteCarloPi(mypid + time(NULL), n, &circle);
+
+            char file_index[digits(i)];
+            sprintf(file_index, "%d", i);
+            fileWrite(file_index, circle);
+
+            printf("%i -- Contando %lli circle\n", mypid, circle);
             exit(0);
         }
     }
@@ -77,37 +83,27 @@ int main()
 
     printf("%i -- Terminado de esperar procesos\n", pidRoot);    
 
-    int64_t squareTotal = 0;
     int64_t circleTotal = 0;
 
     for (int i = 0; i<processCount; i++) {
 
-        char nameSquare[3] = {'s','0',0};
-        char nameCircle[3] = {'c','0',0};
-        nameSquare[1] = nameSquare[1] + i;
-        nameCircle[1] = nameCircle[1] + i;
-        int64_t square = 0;
         int64_t circle = 0;
-
-        // Lee los valores guardados por cada proceso en los archivos y los suma
-        fileRead(nameSquare, &square);
-        fileRead(nameCircle, &circle);
-        squareTotal += square;
+        char file_index[digits(i)];
+        sprintf(file_index, "%d", i);
+        fileRead(file_index, &circle);
         circleTotal += circle;
 
     }
-
+    
     // Dividimos la cantidad de puntos dentro del circulo con N, para hallar una aproximacion de π/4 y la multiplicamos por 4 para obtener la aproximacion de π.
-    double pi = ((double)circleTotal/(double)squareTotal) * 4;
+    double pi = ((double)circleTotal/((double)n*processCount)) * 4;
     
     printf("%i -- Borrado de archivos temporales\n", pidRoot);   
-    char nameSquare[3] = {'s','0',0};
-    char nameCircle[3] = {'c','0',0};
+    
     for (int i = 0; i<processCount; i++) {
-        remove(nameSquare);
-        remove(nameCircle);
-        nameSquare[1] = nameSquare[1] + 1;
-        nameCircle[1] = nameCircle[1] + 1;
+        char file_index[digits(i)];
+        sprintf(file_index, "%d", i);
+        remove(file_index);
     }
 
     printf("%i -- PI: %f\n", pidRoot, pi);
