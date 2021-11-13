@@ -7,19 +7,23 @@
 #include <math.h>
 #include <time.h>
 
-void fileWrite(char* file, int64_t value ) {
+
+// Escribe dos valores linea por linea en un mismo archivo.
+void fileWritePair(char* file, int64_t v1, int64_t v2) {
     FILE* pfile = fopen(file,"w");
-    fprintf(pfile,"%lld\n",value);
+    fprintf(pfile, "%lld\n%lld", v1, v2);
     fclose(pfile);
 }
 
-void fileRead(char* file, int64_t* value ) {
+// Lee dos valores linea por linea de un mismo archivo.
+void fileReadPair(char* file, int64_t* v1, int64_t* v2) {
     FILE* pfile = fopen(file,"r");
-    fscanf(pfile, "%lld", value);
+    fscanf(pfile, "%lld\n%lld", v1, v2);
     fclose(pfile);
 }
 
-void monteCarloPi(int semilla, int64_t samples, int64_t* circle) {
+
+void monteCarloPi(int semilla, int64_t samples, int64_t* circle, int64_t* square) {
     srand(semilla);
     for (int64_t i = 0; i < samples; i++) {
  
@@ -30,6 +34,7 @@ void monteCarloPi(int semilla, int64_t samples, int64_t* circle) {
         double d = sqrt(x*x + y*y);
         // Incrementa circle en 1 si d <= 1
         (*circle) += d <= 1 ? 1 : 0;
+        (*square)++;
     }
 }
 
@@ -57,14 +62,18 @@ int main()
         if (pid == 0) {
             int mypid = getpid();
             printf("%i -- Procesando...\n", mypid);
+            int64_t square = 0;
             int64_t circle = 0;
-            monteCarloPi(mypid + time(NULL), n, &circle);
+            monteCarloPi(mypid + time(NULL), n, &circle, &square);
 
+
+            // Nombramos a los archivos por su indice de subproceso
             char file_index[digits(i)];
+            // Vuelca el entero i en el string file_index para usarlo como nombre de archivo.
             sprintf(file_index, "%d", i);
-            fileWrite(file_index, circle);
+            fileWritePair(file_index, circle, square);
 
-            printf("%i -- Contando %lli circle\n", mypid, circle);
+            printf("%i -- Contando %lli circle para %lli square\n", mypid, circle, square);
             exit(0);
         }
     }
@@ -84,14 +93,17 @@ int main()
     printf("%i -- Terminado de esperar procesos\n", pidRoot);    
 
     int64_t circleTotal = 0;
+    int64_t squareTotal = 0;
 
     for (int i = 0; i<processCount; i++) {
 
         int64_t circle = 0;
+        int64_t square = 0;
         char file_index[digits(i)];
         sprintf(file_index, "%d", i);
-        fileRead(file_index, &circle);
+        fileReadPair(file_index, &circle, &square);
         circleTotal += circle;
+        squareTotal += square;
 
     }
     

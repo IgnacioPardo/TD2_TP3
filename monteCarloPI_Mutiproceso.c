@@ -22,7 +22,18 @@ void fileRead(char* file, int64_t* value ) {
 void monteCarloPi(int semilla, int64_t samples, int64_t* circle, int64_t* square) {
     srand(semilla);
     for (int64_t i = 0; i < samples; i++) {
- 
+
+        // Los puntos que se generan 
+        // (x, y) ∈ {(x, y) / x ∈ [0, 1] / y ∈ [0, 1]}
+        // En otras palabras todos los puntos pertenecen al cuadrante positivo.
+        // Esto significa que el cuadrado es de 1x1, mientras que el circulo por el que evaluamos tiene radio 1.
+        // Es decir que solo consideramos puntos de un cuarto del area del circulo, y un cuarto del cuadrado.
+        // La relacion a evaluar entonces es 
+        // 1/4c / 1/4s = c / s = pi/4
+        // Para expandir a un circulo completo se puede expandir el rango en el que se generan las coordenadas de la siguiente forma.
+        // (((double)rand()/(double)RAND_MAX) * 2) - 1
+        // Sin embargo, al mantenerse la relacion optamos por mantener el rango reducido ya que los resultados son acertados tambien aunque con otra precision.
+
         double x = ((double)rand()/(double)RAND_MAX);
         double y = ((double)rand()/(double)RAND_MAX);
 
