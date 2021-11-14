@@ -60,9 +60,6 @@ int main()
     // Puntos a generar por cada proceso
     int64_t n = 100000000;
 
-    // Array para almacenar los pid de cada proceso child.
-    pid_t children[processCount];
-
     for (int i = 0; i<processCount; i++) {
 
         // Crea nuevo proceso
@@ -94,9 +91,6 @@ int main()
             // Termina el proceso con status 0.
             exit(0);
         }
-
-        // Guarda el pid del child.
-        children[i] = pid;
     }
 
     printf("%i -- Terminado de lanzar procesos\n", pidRoot);
@@ -104,9 +98,8 @@ int main()
     for (int i = 0; i<processCount; i++) {
 
         // Espera a que termine el proceso hijo
-        pid_t child = children[i];
         int status;
-        wait(&status);
+        pid_t child = wait(&status);
 
         printf("%i -- Esperando por %i terminado con status %i\n", pidRoot, child, status);
     }
